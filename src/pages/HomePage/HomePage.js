@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import styles from './HomePage.module.scss';
 import Recipe from './components/Recipe/Recipe';
 import Loading from '../../components/Loading/Loading';
@@ -7,6 +7,32 @@ export default function HomePage() {
   const [recipes, setRecipes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState('');
+
+  useEffect(() => {
+    let cancel = false;
+    async function fetchRecipes() {
+      try {
+        setIsLoading(true);
+        const response = await fetch('https://restapi.fr/api/recipes');
+        if (response.ok && !cancel) {
+          const newRecipes = await response.json();
+          setRecipes((x) =>
+            Array.isArray(newRecipes)
+              ? [...x, ...newRecipes]
+              : [...x, newRecipes]
+          );
+        }
+      } catch (e) {
+        console.log('ERREUR');
+      } finally {
+        if (!cancel) {
+          setIsLoading(false);
+        }
+      }
+    }
+    fetchRecipes();
+    return () => (cancel = true);
+  }, []);
 
   function handleInput(e) {
     const filter = e.target.value;
@@ -37,11 +63,7 @@ export default function HomePage() {
             {recipes
               .filter((r) => r.title.toLowerCase().startsWith(filter))
               .map((r) => (
-                <Recipe
-                  key={r._id}
-                  recipe={r}
-                  toggleLikedRecipe={updateRecipe}
-                />
+                <Recipe key={r._id} title={r.title} image={r.image} />
               ))}
           </div>
         )}
