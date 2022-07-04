@@ -15,12 +15,8 @@ export default function HomePage() {
         setIsLoading(true);
         const response = await fetch('https://restapi.fr/api/recipes');
         if (response.ok && !cancel) {
-          const newRecipes = await response.json();
-          setRecipes((x) =>
-            Array.isArray(newRecipes)
-              ? [...x, ...newRecipes]
-              : [...x, newRecipes]
-          );
+          const recipes = await response.json();
+          setRecipes(Array.isArray(recipes) ? recipes : [recipes]);
         }
       } catch (e) {
         console.log('ERREUR');
