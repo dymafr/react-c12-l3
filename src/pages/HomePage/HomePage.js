@@ -1,19 +1,21 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import styles from './HomePage.module.scss';
 import Recipe from './components/Recipe/Recipe';
 import Loading from '../../components/Loading/Loading';
+import { ApiContext } from '../../context/ApiContext';
 
 export default function HomePage() {
   const [recipes, setRecipes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [filter, setFilter] = useState('');
+  const BASE_URL_API = useContext(ApiContext);
 
   useEffect(() => {
     let cancel = false;
     async function fetchRecipes() {
       try {
         setIsLoading(true);
-        const response = await fetch('https://restapi.fr/api/recipes');
+        const response = await fetch(BASE_URL_API);
         if (response.ok && !cancel) {
           const recipes = await response.json();
           setRecipes(Array.isArray(recipes) ? recipes : [recipes]);
